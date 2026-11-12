@@ -17,7 +17,9 @@ interface RowItem {
 }
 
 export const ComplexityModal: React.FC<ComplexityModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'all' | 'll' | 'stack' | 'queue' | 'bst'>('all');
+  const [activeTab, setActiveTab] = useState<
+    'all' | 'll' | 'stack' | 'queue' | 'bst' | 'hash' | 'heap' | 'graph' | 'sort'
+  >('all');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,6 +70,31 @@ export const ComplexityModal: React.FC<ComplexityModalProps> = ({ isOpen, onClos
     { op: 'Level Order (BFS)', best: 'O(n)', avg: 'O(n)', worst: 'O(n)', auxSpace: 'O(w)', notes: 'FIFO queue bounded by max tree width w' },
     { op: 'Find Min / Max', best: 'O(1)', avg: 'O(log n)', worst: 'O(n)', auxSpace: 'O(1)', notes: 'Walks strictly left or right spine' },
     { op: 'Calculate Height', best: 'O(n)', avg: 'O(n)', worst: 'O(n)', auxSpace: 'O(h)', notes: 'Post-order recursion across all nodes' },
+  ];
+
+  const hashRows: RowItem[] = [
+    { op: 'Insert / Search / Delete (Avg)', best: 'O(1)', avg: 'O(1)', worst: 'O(n)', auxSpace: 'O(m + n)', notes: 'Degrades to O(n) under heavy hash collisions' },
+    { op: 'Rehash on Resize', best: 'O(n)', avg: 'O(n)', worst: 'O(n)', auxSpace: 'O(m + n)', notes: 'Recomputes key mod newCapacity across items' },
+  ];
+
+  const heapRows: RowItem[] = [
+    { op: 'Insert / Enqueue', best: 'O(1)', avg: 'O(log n)', worst: 'O(log n)', auxSpace: 'O(1)', notes: 'Appends at end then sifts up along tree height' },
+    { op: 'Extract Min / Max', best: 'O(log n)', avg: 'O(log n)', worst: 'O(log n)', auxSpace: 'O(1)', notes: 'Moves last item to root then sifts down' },
+    { op: 'Peek Root', best: 'O(1)', avg: 'O(1)', worst: 'O(1)', auxSpace: 'O(1)', notes: 'Reads array[0] directly' },
+  ];
+
+  const graphRows: RowItem[] = [
+    { op: 'BFS / DFS Traversal', best: 'O(V + E)', avg: 'O(V + E)', worst: 'O(V + E)', auxSpace: 'O(V)', notes: 'Visits each reachable vertex and edge once' },
+    { op: 'Dijkstra Shortest Path', best: 'O((V + E) log V)', avg: 'O((V + E) log V)', worst: 'O((V + E) log V)', auxSpace: 'O(V)', notes: 'Priority-ordered distance relaxation (non-negative weights)' },
+    { op: 'Prim / Kruskal MST', best: 'O(E log V)', avg: 'O(E log E)', worst: 'O(E log E)', auxSpace: 'O(V)', notes: 'Greedy minimum spanning tree with Disjoint Set / cut selection' },
+  ];
+
+  const sortRows: RowItem[] = [
+    { op: 'Bubble / Selection / Insertion', best: 'O(n) / O(n^2)', avg: 'O(n^2)', worst: 'O(n^2)', auxSpace: 'O(1)', notes: 'In-place quadratic sorts; Insertion excels on nearly-sorted inputs' },
+    { op: 'Merge Sort', best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)', auxSpace: 'O(n)', notes: 'Guaranteed divide-and-conquer stable sort' },
+    { op: 'Quick Sort', best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n^2)', auxSpace: 'O(log n)', notes: 'Fast cache-friendly in-place partitioning' },
+    { op: 'Heap Sort', best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)', auxSpace: 'O(1)', notes: 'Max-heap construction + in-place extraction' },
+    { op: 'Linear / Binary Search', best: 'O(1)', avg: 'O(n) / O(log n)', worst: 'O(n) / O(log n)', auxSpace: 'O(1)', notes: 'Binary search halves sorted ranges each step' },
   ];
 
   const renderTableSection = (title: string, rows: RowItem[], accentColor: string) => (
@@ -147,18 +174,33 @@ export const ComplexityModal: React.FC<ComplexityModalProps> = ({ isOpen, onClos
 
             <div className="px-6 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center gap-1.5 overflow-x-auto">
               {[
-                { id: 'all', label: 'All Structures' },
+                { id: 'all', label: 'All' },
                 { id: 'll', label: 'Linked List' },
                 { id: 'stack', label: 'Stack' },
                 { id: 'queue', label: 'Queue' },
-                { id: 'bst', label: 'Binary Search Tree' },
+                { id: 'bst', label: 'BST' },
+                { id: 'hash', label: 'Hash Table' },
+                { id: 'heap', label: 'Heap / PQ' },
+                { id: 'graph', label: 'Graphs' },
+                { id: 'sort', label: 'Sorting & Search' },
               ].map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() =>
-                      setActiveTab(tab.id as 'all' | 'll' | 'stack' | 'queue' | 'bst')
+                      setActiveTab(
+                        tab.id as
+                          | 'all'
+                          | 'll'
+                          | 'stack'
+                          | 'queue'
+                          | 'bst'
+                          | 'hash'
+                          | 'heap'
+                          | 'graph'
+                          | 'sort'
+                      )
                     }
                     className={`relative px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                       isActive ? 'text-white font-semibold' : 'text-slate-600 hover:text-slate-900'
@@ -205,6 +247,18 @@ export const ComplexityModal: React.FC<ComplexityModalProps> = ({ isOpen, onClos
 
               {(activeTab === 'all' || activeTab === 'bst') &&
                 renderTableSection('Binary Search Tree (BST)', bstRows, 'bg-indigo-600')}
+
+              {(activeTab === 'all' || activeTab === 'hash') &&
+                renderTableSection('Hash Table (Chaining & Linear Probing)', hashRows, 'bg-amber-500')}
+
+              {(activeTab === 'all' || activeTab === 'heap') &&
+                renderTableSection('Binary Heap & Priority Queue', heapRows, 'bg-emerald-600')}
+
+              {(activeTab === 'all' || activeTab === 'graph') &&
+                renderTableSection('Graphs, Shortest Path & MST', graphRows, 'bg-brand-600')}
+
+              {(activeTab === 'all' || activeTab === 'sort') &&
+                renderTableSection('Sorting & Searching Algorithms', sortRows, 'bg-rose-500')}
             </div>
 
             <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">

@@ -1,4 +1,14 @@
-export type DSAType = 'linked-list' | 'stack' | 'queue' | 'bst';
+export type DSAType =
+  | 'linked-list'
+  | 'stack'
+  | 'queue'
+  | 'bst'
+  | 'hash-table'
+  | 'heap'
+  | 'priority-queue'
+  | 'graph';
+
+export type AppView = 'home' | DSAType | 'algorithms' | 'compare' | 'campus';
 
 export interface ComplexityInfo {
   timeBest: string;
@@ -31,7 +41,7 @@ export interface OperationExplanation {
 export interface HistoryItem {
   id: string;
   timestamp: number;
-  dsType: DSAType;
+  dsType: string;
   operationName: string;
   description: string;
   success: boolean;

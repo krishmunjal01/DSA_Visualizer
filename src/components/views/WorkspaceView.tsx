@@ -5,20 +5,32 @@ import { LLStateSnapshot } from '../../types/linkedList';
 import { StackStateSnapshot } from '../../types/stack';
 import { QueueStateSnapshot } from '../../types/queue';
 import { BSTStateSnapshot } from '../../types/bst';
+import { HashTableSnapshot, CollisionMode } from '../../types/hashTable';
+import { HeapStateSnapshot, HeapOrder } from '../../types/heap';
+import { GraphStateSnapshot } from '../../types/graph';
 import { SinglyLinkedList } from '../../core/LinkedList';
 import { Stack } from '../../core/Stack';
 import { Queue } from '../../core/Queue';
 import { BinarySearchTree } from '../../core/BST';
+import { HashTable } from '../../core/HashTable';
+import { BinaryHeap } from '../../core/Heap';
+import { Graph } from '../../core/Graph';
 
 import { LinkedListVisualizer } from '../visualizers/LinkedListVisualizer';
 import { StackVisualizer } from '../visualizers/StackVisualizer';
 import { QueueVisualizer } from '../visualizers/QueueVisualizer';
 import { BSTVisualizer } from '../visualizers/BSTVisualizer';
+import { HashTableVisualizer } from '../visualizers/HashTableVisualizer';
+import { HeapVisualizer } from '../visualizers/HeapVisualizer';
+import { GraphVisualizer } from '../visualizers/GraphVisualizer';
 
 import { LinkedListPanel } from '../panels/LinkedListPanel';
 import { StackPanel } from '../panels/StackPanel';
 import { QueuePanel } from '../panels/QueuePanel';
 import { BSTPanel } from '../panels/BSTPanel';
+import { HashTablePanel } from '../panels/HashTablePanel';
+import { HeapPanel } from '../panels/HeapPanel';
+import { GraphPanel } from '../panels/GraphPanel';
 
 import { AnimationControls } from '../common/AnimationControls';
 import { ExplanationPanel } from '../common/ExplanationPanel';
@@ -30,6 +42,10 @@ import {
   Layers,
   ArrowRightLeft,
   GitBranch,
+  Hash,
+  GitFork,
+  ListOrdered,
+  Share2,
   ArrowLeft,
   RotateCcw,
   RefreshCw,
@@ -51,11 +67,19 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   const stackRef = useRef(new Stack(7, true));
   const queueRef = useRef(new Queue(7, true));
   const bstRef = useRef(new BinarySearchTree());
+  const hashTableRef = useRef(new HashTable(7, 'chaining'));
+  const heapRef = useRef(new BinaryHeap('min', 'heap'));
+  const pqRef = useRef(new BinaryHeap('min', 'priority-queue'));
+  const graphRef = useRef(new Graph('default'));
 
   const [llSnapshot, setLLSnapshot] = useState(linkedListRef.current.getSnapshot());
   const [stackSnapshot, setStackSnapshot] = useState(stackRef.current.getSnapshot());
   const [queueSnapshot, setQueueSnapshot] = useState(queueRef.current.getSnapshot());
   const [bstSnapshot, setBSTSnapshot] = useState(bstRef.current.getSnapshot());
+  const [hashSnapshot, setHashSnapshot] = useState(hashTableRef.current.getSnapshot());
+  const [heapSnapshot, setHeapSnapshot] = useState(heapRef.current.getSnapshot());
+  const [pqSnapshot, setPQSnapshot] = useState(pqRef.current.getSnapshot());
+  const [graphSnapshot, setGraphSnapshot] = useState(graphRef.current.getSnapshot());
 
   const [steps, setSteps] = useState<AnimationStep[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -147,6 +171,85 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
         resultMessage: 'Balanced BST initialized with 7 nodes.',
         status: 'idle',
       });
+    } else if (type === 'hash-table') {
+      const ht = new HashTable(7, hashTableRef.current.getMode());
+      [10, 17, 24, 5, 12].forEach((k) => ht.insertDirect(k));
+      hashTableRef.current = ht;
+      setHashSnapshot(ht.getSnapshot());
+      setExplanation({
+        operationName: 'INITIALIZE',
+        displayName: 'Hash Table Initialized',
+        whatHappens: 'Hash table loaded with sample keys demonstrating modulo hashing and collisions (10, 17, 24 all hash to bucket 3 mod 7).',
+        pseudocode: ['h(k) = k mod capacity', 'insert(10), insert(17), insert(24), insert(5), insert(12)'],
+        complexity: {
+          timeBest: 'O(1)',
+          timeAverage: 'O(1 + alpha)',
+          timeWorst: 'O(n)',
+          auxiliarySpace: 'O(m + n)',
+        },
+        resultMessage: 'Hash table initialized with 5 keys.',
+        status: 'idle',
+      });
+    } else if (type === 'heap') {
+      const h = new BinaryHeap(heapRef.current.getOrder(), 'heap');
+      [12, 24, 18, 35, 29, 40].forEach((p) => h.insertDirect(p));
+      heapRef.current = h;
+      setHeapSnapshot(h.getSnapshot());
+      setExplanation({
+        operationName: 'INITIALIZE',
+        displayName: 'Binary Heap Initialized',
+        whatHappens: 'Complete binary tree stored in an array maintaining parent-child heap order.',
+        pseudocode: ['parent(i) = floor((i - 1) / 2)', 'left(i) = 2i + 1, right(i) = 2i + 2'],
+        complexity: {
+          timeBest: 'O(1)',
+          timeAverage: 'O(log n)',
+          timeWorst: 'O(log n)',
+          auxiliarySpace: 'O(n)',
+        },
+        resultMessage: 'Binary heap initialized with 6 items.',
+        status: 'idle',
+      });
+    } else if (type === 'priority-queue') {
+      const pq = new BinaryHeap(pqRef.current.getOrder(), 'priority-queue');
+      pq.insertDirect(1, 'Emergency ER');
+      pq.insertDirect(4, 'Lab Report');
+      pq.insertDirect(2, 'Router Packet');
+      pq.insertDirect(7, 'Backup Sync');
+      pq.insertDirect(3, 'Print Job');
+      pqRef.current = pq;
+      setPQSnapshot(pq.getSnapshot());
+      setExplanation({
+        operationName: 'INITIALIZE',
+        displayName: 'Priority Queue Initialized',
+        whatHappens: 'Priority queue backed by a binary heap so the highest-priority task sits at the root.',
+        pseudocode: ['enqueue(priority, label) -> O(log n)', 'dequeue() -> extract root -> O(log n)'],
+        complexity: {
+          timeBest: 'O(1) peek',
+          timeAverage: 'O(log n)',
+          timeWorst: 'O(log n)',
+          auxiliarySpace: 'O(n)',
+        },
+        resultMessage: 'Priority queue initialized with 5 scheduled tasks.',
+        status: 'idle',
+      });
+    } else if (type === 'graph') {
+      const g = new Graph('default');
+      graphRef.current = g;
+      setGraphSnapshot(g.getSnapshot());
+      setExplanation({
+        operationName: 'INITIALIZE',
+        displayName: 'Graph Initialized',
+        whatHappens: 'Loaded weighted undirected graph. Click any edge to toggle a block or run BFS, DFS, Dijkstra, Prim, or Kruskal.',
+        pseudocode: ['G = (V, E)', 'adj[u] stores (v, weight)'],
+        complexity: {
+          timeBest: 'O(V + E)',
+          timeAverage: 'O((V + E) log V)',
+          timeWorst: 'O(E log E)',
+          auxiliarySpace: 'O(V + E)',
+        },
+        resultMessage: 'Weighted graph ready for traversal and path algorithms.',
+        status: 'idle',
+      });
     }
   }, []);
 
@@ -158,7 +261,11 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
     if (dsType === 'linked-list') return linkedListRef.current.getSnapshot();
     if (dsType === 'stack') return stackRef.current.getSnapshot();
     if (dsType === 'queue') return queueRef.current.getSnapshot();
-    return bstRef.current.getSnapshot();
+    if (dsType === 'bst') return bstRef.current.getSnapshot();
+    if (dsType === 'hash-table') return hashTableRef.current.getSnapshot();
+    if (dsType === 'heap') return heapRef.current.getSnapshot();
+    if (dsType === 'priority-queue') return pqRef.current.getSnapshot();
+    return graphRef.current.getSnapshot();
   };
 
   const pushHistoryItem = (
@@ -184,6 +291,10 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       if (dsType === 'stack') setStackSnapshot(step.stateSnapshot as StackStateSnapshot);
       if (dsType === 'queue') setQueueSnapshot(step.stateSnapshot as QueueStateSnapshot);
       if (dsType === 'bst') setBSTSnapshot(step.stateSnapshot as BSTStateSnapshot);
+      if (dsType === 'hash-table') setHashSnapshot(step.stateSnapshot as HashTableSnapshot);
+      if (dsType === 'heap') setHeapSnapshot(step.stateSnapshot as HeapStateSnapshot);
+      if (dsType === 'priority-queue') setPQSnapshot(step.stateSnapshot as HeapStateSnapshot);
+      if (dsType === 'graph') setGraphSnapshot(step.stateSnapshot as GraphStateSnapshot);
     },
     [dsType]
   );
@@ -322,6 +433,32 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       }
       bstRef.current = newBST;
       setBSTSnapshot(newBST.getSnapshot());
+    } else if (dsType === 'hash-table' && last.snapshot) {
+      const snap = last.snapshot as HashTableSnapshot;
+      const newHT = new HashTable(snap.capacity, snap.mode);
+      snap.buckets.forEach((b) =>
+        b.entries.forEach((entry) => newHT.insertDirect(entry.key, entry.value))
+      );
+      hashTableRef.current = newHT;
+      setHashSnapshot(newHT.getSnapshot());
+    } else if (dsType === 'heap' && last.snapshot) {
+      const snap = last.snapshot as HeapStateSnapshot;
+      const newHeap = new BinaryHeap(snap.order, 'heap');
+      snap.items.forEach((it) => newHeap.insertDirect(it.priority, it.label, it.id));
+      heapRef.current = newHeap;
+      setHeapSnapshot(newHeap.getSnapshot());
+    } else if (dsType === 'priority-queue' && last.snapshot) {
+      const snap = last.snapshot as HeapStateSnapshot;
+      const newPQ = new BinaryHeap(snap.order, 'priority-queue');
+      snap.items.forEach((it) => newPQ.insertDirect(it.priority, it.label, it.id));
+      pqRef.current = newPQ;
+      setPQSnapshot(newPQ.getSnapshot());
+    } else if (dsType === 'graph' && last.snapshot) {
+      const snap = last.snapshot as GraphStateSnapshot;
+      const preset = snap.presetName === 'campus' ? 'campus' : snap.directed ? 'directed' : 'default';
+      const newGraph = new Graph(preset);
+      graphRef.current = newGraph;
+      setGraphSnapshot(newGraph.getSnapshot());
     }
 
     setExplanation({
@@ -374,6 +511,18 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
     } else if (dsType === 'bst') {
       bstRef.current.clear();
       setBSTSnapshot(bstRef.current.getSnapshot());
+    } else if (dsType === 'hash-table') {
+      hashTableRef.current.clear();
+      setHashSnapshot(hashTableRef.current.getSnapshot());
+    } else if (dsType === 'heap') {
+      heapRef.current.clear();
+      setHeapSnapshot(heapRef.current.getSnapshot());
+    } else if (dsType === 'priority-queue') {
+      pqRef.current.clear();
+      setPQSnapshot(pqRef.current.getSnapshot());
+    } else if (dsType === 'graph') {
+      graphRef.current.loadPreset('default');
+      setGraphSnapshot(graphRef.current.getSnapshot());
     }
 
     setExplanation({
@@ -449,6 +598,28 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       }
       bstRef.current = bst;
       setBSTSnapshot(bst.getSnapshot());
+    } else if (dsType === 'hash-table') {
+      const ht = new HashTable(hashTableRef.current.getCapacity(), hashTableRef.current.getMode());
+      [7, 14, 21, 10, 17, 24].forEach((k) => ht.insertDirect(k));
+      hashTableRef.current = ht;
+      setHashSnapshot(ht.getSnapshot());
+    } else if (dsType === 'heap') {
+      const h = new BinaryHeap(heapRef.current.getOrder(), 'heap');
+      [9, 15, 22, 31, 45, 50, 27].forEach((n) => h.insertDirect(n));
+      heapRef.current = h;
+      setHeapSnapshot(h.getSnapshot());
+    } else if (dsType === 'priority-queue') {
+      const pq = new BinaryHeap(pqRef.current.getOrder(), 'priority-queue');
+      pq.insertDirect(1, 'Emergency ER');
+      pq.insertDirect(2, 'API Alert');
+      pq.insertDirect(5, 'Index Sync');
+      pq.insertDirect(3, 'Build Job');
+      pqRef.current = pq;
+      setPQSnapshot(pq.getSnapshot());
+    } else if (dsType === 'graph') {
+      const preset = sampleKey === 'directed' ? 'directed' : sampleKey === 'campus' ? 'campus' : 'default';
+      graphRef.current.loadPreset(preset);
+      setGraphSnapshot(graphRef.current.getSnapshot());
     }
 
     setExplanation({
@@ -501,6 +672,38 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           desc: 'Hierarchical BST with left < parent < right key ordering.',
           size: bstSnapshot.size,
           sizeLabel: 'Nodes',
+        };
+      case 'hash-table':
+        return {
+          title: 'Hash Table Workspace',
+          icon: <Hash className="w-5 h-5 text-amber-600" />,
+          desc: 'Open-addressing linear probing and separate chaining with modulo hashing.',
+          size: hashSnapshot.size,
+          sizeLabel: 'Keys',
+        };
+      case 'heap':
+        return {
+          title: 'Binary Heap Workspace',
+          icon: <GitFork className="w-5 h-5 text-emerald-600" />,
+          desc: 'Complete binary tree stored in an array with sift-up and sift-down balancing.',
+          size: heapSnapshot.size,
+          sizeLabel: 'Items',
+        };
+      case 'priority-queue':
+        return {
+          title: 'Priority Queue Workspace',
+          icon: <ListOrdered className="w-5 h-5 text-rose-600" />,
+          desc: 'Task scheduler backed by a binary heap for O(log n) priority extraction.',
+          size: pqSnapshot.size,
+          sizeLabel: 'Tasks',
+        };
+      case 'graph':
+        return {
+          title: 'Graph Workspace',
+          icon: <Share2 className="w-5 h-5 text-brand-600" />,
+          desc: 'Directed/undirected weighted graph supporting BFS, DFS, Dijkstra, Prim, and Kruskal.',
+          size: graphSnapshot.vertices.length,
+          sizeLabel: 'Vertices',
         };
     }
   };
@@ -599,6 +802,18 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
               {dsType === 'stack' && <StackVisualizer snapshot={stackSnapshot} />}
               {dsType === 'queue' && <QueueVisualizer snapshot={queueSnapshot} />}
               {dsType === 'bst' && <BSTVisualizer snapshot={bstSnapshot} />}
+              {dsType === 'hash-table' && <HashTableVisualizer snapshot={hashSnapshot} />}
+              {dsType === 'heap' && <HeapVisualizer snapshot={heapSnapshot} />}
+              {dsType === 'priority-queue' && <HeapVisualizer snapshot={pqSnapshot} />}
+              {dsType === 'graph' && (
+                <GraphVisualizer
+                  snapshot={graphSnapshot}
+                  onToggleEdgeBlock={(edgeId) => {
+                    graphRef.current.toggleBlockEdge(edgeId);
+                    setGraphSnapshot(graphRef.current.getSnapshot());
+                  }}
+                />
+              )}
             </div>
 
             <div className="p-3 border-t border-slate-100 bg-slate-50/40">
@@ -882,6 +1097,129 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
                 }}
                 isAnimating={isPlaying}
                 treeSize={bstSnapshot.size}
+              />
+            )}
+
+            {dsType === 'hash-table' && (
+              <HashTablePanel
+                onInsert={(k, v) => runOperation(() => hashTableRef.current.insert(k, v), 'HASH_INSERT', true)}
+                onSearch={(k) => runOperation(() => hashTableRef.current.search(k), 'HASH_SEARCH', false)}
+                onDelete={(k) => runOperation(() => hashTableRef.current.delete(k), 'HASH_DELETE', true)}
+                onReconfigure={(cap, mode: CollisionMode) => {
+                  const prevSnapshot = hashTableRef.current.getSnapshot();
+                  snapshotHistoryRef.current.push({
+                    dsType,
+                    opName: 'REHASH',
+                    snapshot: prevSnapshot,
+                  });
+                  hashTableRef.current.reconfigure(cap, mode);
+                  setIsPlaying(false);
+                  setSteps([]);
+                  setCurrentStepIndex(0);
+                  setHashSnapshot(hashTableRef.current.getSnapshot());
+                  setExplanation({
+                    operationName: `RECONFIGURE(${cap}, ${mode})`,
+                    displayName: 'Rehash Table',
+                    whatHappens: `Re-inserted all existing keys using capacity ${cap} and ${mode} strategy.`,
+                    pseudocode: ['for key in entries: h(key) = key mod newCapacity'],
+                    complexity: {
+                      timeBest: 'O(n)',
+                      timeAverage: 'O(n)',
+                      timeWorst: 'O(n^2)',
+                      auxiliarySpace: 'O(m + n)',
+                    },
+                    resultMessage: `Reconfigured hash table to m=${cap} (${mode}).`,
+                    status: 'success',
+                  });
+                  pushHistoryItem(`REHASH(m=${cap}, ${mode})`, `Rehashed table to m=${cap} (${mode}).`, true);
+                }}
+                onLoadSample={handleLoadSample}
+                onClear={handleClear}
+                isAnimating={isPlaying}
+                capacity={hashSnapshot.capacity}
+                mode={hashSnapshot.mode}
+                size={hashSnapshot.size}
+              />
+            )}
+
+            {dsType === 'heap' && (
+              <HeapPanel
+                mode="heap"
+                order={heapSnapshot.order}
+                size={heapSnapshot.size}
+                isAnimating={isPlaying}
+                onInsert={(p, lbl) => runOperation(() => heapRef.current.insert(p, lbl), 'HEAP_INSERT', true)}
+                onExtractTop={() => runOperation(() => heapRef.current.extractTop(), 'HEAP_EXTRACT', true)}
+                onPeekTop={() => runOperation(() => heapRef.current.peekTop(), 'HEAP_PEEK', false)}
+                onOrderChange={(ord: HeapOrder) => {
+                  heapRef.current.setOrder(ord);
+                  setIsPlaying(false);
+                  setSteps([]);
+                  setCurrentStepIndex(0);
+                  setHeapSnapshot(heapRef.current.getSnapshot());
+                }}
+                onLoadSample={() => handleLoadSample('heap')}
+                onClear={handleClear}
+              />
+            )}
+
+            {dsType === 'priority-queue' && (
+              <HeapPanel
+                mode="priority-queue"
+                order={pqSnapshot.order}
+                size={pqSnapshot.size}
+                isAnimating={isPlaying}
+                onInsert={(p, lbl) => runOperation(() => pqRef.current.insert(p, lbl), 'PQ_ENQUEUE', true)}
+                onExtractTop={() => runOperation(() => pqRef.current.extractTop(), 'PQ_DEQUEUE', true)}
+                onPeekTop={() => runOperation(() => pqRef.current.peekTop(), 'PQ_PEEK', false)}
+                onOrderChange={(ord: HeapOrder) => {
+                  pqRef.current.setOrder(ord);
+                  setIsPlaying(false);
+                  setSteps([]);
+                  setCurrentStepIndex(0);
+                  setPQSnapshot(pqRef.current.getSnapshot());
+                }}
+                onLoadSample={() => handleLoadSample('pq')}
+                onClear={handleClear}
+              />
+            )}
+
+            {dsType === 'graph' && (
+              <GraphPanel
+                vertices={graphSnapshot.vertices}
+                directed={graphSnapshot.directed}
+                weighted={graphSnapshot.weighted}
+                isAnimating={isPlaying}
+                onRunBFS={(startId) => runOperation(() => graphRef.current.bfs(startId), 'GRAPH_BFS', false)}
+                onRunDFS={(startId) => runOperation(() => graphRef.current.dfs(startId), 'GRAPH_DFS', false)}
+                onRunDijkstra={(src, dst) =>
+                  runOperation(() => graphRef.current.dijkstra(src, dst), 'GRAPH_DIJKSTRA', false)
+                }
+                onRunPrim={(startId) => runOperation(() => graphRef.current.prim(startId), 'GRAPH_PRIM', false)}
+                onRunKruskal={() => runOperation(() => graphRef.current.kruskal(), 'GRAPH_KRUSKAL', false)}
+                onSetDirected={(d) => {
+                  graphRef.current.setDirected(d);
+                  setIsPlaying(false);
+                  setSteps([]);
+                  setCurrentStepIndex(0);
+                  setGraphSnapshot(graphRef.current.getSnapshot());
+                }}
+                onSetWeighted={(w) => {
+                  graphRef.current.setWeighted(w);
+                  setIsPlaying(false);
+                  setSteps([]);
+                  setCurrentStepIndex(0);
+                  setGraphSnapshot(graphRef.current.getSnapshot());
+                }}
+                onAddVertex={(lbl) => {
+                  graphRef.current.addVertex(lbl);
+                  setGraphSnapshot(graphRef.current.getSnapshot());
+                }}
+                onAddEdge={(from, to, weight) => {
+                  graphRef.current.addEdge(from, to, weight);
+                  setGraphSnapshot(graphRef.current.getSnapshot());
+                }}
+                onLoadPreset={(preset) => handleLoadSample(preset)}
               />
             )}
           </div>

@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { DSAType } from '../../types/dsa';
+import { AppView, DSAType } from '../../types/dsa';
 import {
   Link2,
   Layers,
   ArrowRightLeft,
   GitBranch,
+  Hash,
+  GitFork,
+  ListOrdered,
+  Share2,
+  BarChart3,
+  GitCompare,
+  MapPin,
   ArrowRight,
   Play,
   RotateCcw,
@@ -19,7 +26,7 @@ import {
 import { sound } from '../common/SoundEffects';
 
 interface HomeViewProps {
-  onSelectDS: (ds: DSAType) => void;
+  onSelectDS: (view: AppView) => void;
   onOpenComplexity: () => void;
 }
 
@@ -213,6 +220,113 @@ export const HomeView: React.FC<HomeViewProps> = ({ onSelectDS, onOpenComplexity
         </div>
       ),
     },
+    {
+      id: 'hash-table',
+      title: 'Hash Table',
+      tagline: 'Chaining & Probing',
+      description:
+        'Map integer keys to fixed buckets via modulo arithmetic. Inspect chaining buckets, linear probe jumps, and tombstones.',
+      icon: <Hash className="w-6 h-6 text-amber-600" />,
+      accentBorder: 'hover:border-amber-300',
+      badgeBg: 'bg-amber-50 text-amber-700 border-amber-200',
+      operations: ['Insert Key', 'Search / Delete', 'Chaining', 'Linear Probing'],
+      timeSummary: 'Average O(1) | Collision O(n)',
+      preview: (
+        <div className="flex items-center justify-center gap-2 py-3 px-2 bg-slate-50/80 rounded-xl border border-slate-100 font-mono text-[11px]">
+          <span className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-600">
+            [3]
+          </span>
+          <ArrowRight className="w-3 h-3 text-slate-400" />
+          <span className="px-2 py-1 rounded bg-amber-50 border border-amber-300 text-amber-800 font-bold">
+            10
+          </span>
+          <ArrowRight className="w-3 h-3 text-slate-400" />
+          <span className="px-2 py-1 rounded bg-orange-50 border border-orange-300 text-orange-800 font-bold">
+            17
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'heap',
+      title: 'Binary Heap',
+      tagline: 'Min / Max Heap',
+      description:
+        'Switch between Min-Heap and Max-Heap order while viewing both the complete tree diagram and its backing array.',
+      icon: <GitFork className="w-6 h-6 text-emerald-600" />,
+      accentBorder: 'hover:border-emerald-300',
+      badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      operations: ['Insert & Sift-Up', 'Extract Root', 'Peek Root', 'Min/Max Mode'],
+      timeSummary: 'Peek O(1) | Insert/Extract O(log n)',
+      preview: (
+        <div className="flex items-center justify-center gap-1.5 py-3 px-2 bg-slate-50/80 rounded-xl border border-slate-100 font-mono text-[11px]">
+          {[12, 24, 18, 35].map((v, idx) => (
+            <div
+              key={v}
+              className={`px-2 py-1 rounded border font-bold ${
+                idx === 0
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                  : 'bg-white border-slate-200 text-slate-700'
+              }`}
+            >
+              {v}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: 'priority-queue',
+      title: 'Priority Queue',
+      tagline: 'Heap-Backed Queue',
+      description:
+        'Schedule labeled tasks by numeric priority. Enqueue new jobs and extract the highest-priority task deterministically.',
+      icon: <ListOrdered className="w-6 h-6 text-rose-600" />,
+      accentBorder: 'hover:border-rose-300',
+      badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
+      operations: ['Enqueue Priority', 'Dequeue Top', 'Peek Next Task'],
+      timeSummary: 'Peek O(1) | Enqueue/Dequeue O(log n)',
+      preview: (
+        <div className="flex items-center justify-center gap-1.5 py-3 px-2 bg-slate-50/80 rounded-xl border border-slate-100 font-mono text-[11px]">
+          <span className="px-2 py-1 rounded bg-rose-50 border border-rose-300 text-rose-800 font-bold">
+            P1: ER
+          </span>
+          <span className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-700">
+            P2: Router
+          </span>
+          <span className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-700">
+            P4: Lab
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'graph',
+      title: 'Graphs',
+      tagline: 'Directed & Weighted',
+      description:
+        'Build directed or undirected weighted graphs, toggle blocked edges, and trace BFS, DFS, Dijkstra, Prim, and Kruskal.',
+      icon: <Share2 className="w-6 h-6 text-brand-600" />,
+      accentBorder: 'hover:border-brand-300',
+      badgeBg: 'bg-brand-50 text-brand-700 border-brand-200',
+      operations: ['BFS / DFS', 'Dijkstra Path', 'Prim & Kruskal', 'Block Edges'],
+      timeSummary: 'Traversal O(V + E) | Shortest Path O((V+E) log V)',
+      preview: (
+        <div className="flex items-center justify-center gap-2 py-3 px-2 bg-slate-50/80 rounded-xl border border-slate-100 font-mono text-[11px]">
+          <span className="w-6 h-6 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center">
+            A
+          </span>
+          <span className="text-slate-400">--4--</span>
+          <span className="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center">
+            B
+          </span>
+          <span className="text-slate-400">--2--</span>
+          <span className="w-6 h-6 rounded-full bg-violet-600 text-white font-bold flex items-center justify-center">
+            F
+          </span>
+        </div>
+      ),
+    },
   ];
 
   const activeBstVal = inorderOrder[bstHighlightIdx];
@@ -239,9 +353,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onSelectDS, onOpenComplexity
               </h1>
 
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
-                Run operations directly on TypeScript linked list, stack, circular queue, and
-                binary search tree models. Pause at any step to inspect pointer state, synchronized
-                pseudocode, and asymptotic bounds.
+                Run operations directly on TypeScript linked list, stack, queue, BST, hash table,
+                heap, priority queue, and graph models — plus compare sorting algorithms head-to-head
+                or plan campus shortest paths.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -284,12 +398,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onSelectDS, onOpenComplexity
 
               <div className="pt-4 border-t border-slate-200/80 grid grid-cols-3 gap-4 max-w-md">
                 <div>
-                  <div className="text-lg font-extrabold font-mono text-slate-900">4</div>
+                  <div className="text-lg font-extrabold font-mono text-slate-900">8</div>
                   <div className="text-[11px] text-slate-500">Data Structures</div>
                 </div>
                 <div>
-                  <div className="text-lg font-extrabold font-mono text-slate-900">30+</div>
-                  <div className="text-[11px] text-slate-500">Traced Operations</div>
+                  <div className="text-lg font-extrabold font-mono text-slate-900">13</div>
+                  <div className="text-[11px] text-slate-500">Traced Algorithms</div>
                 </div>
                 <div>
                   <div className="text-lg font-extrabold font-mono text-slate-900">100%</div>
@@ -716,6 +830,70 @@ export const HomeView: React.FC<HomeViewProps> = ({ onSelectDS, onOpenComplexity
           </div>
         </section>
 
+        {/* Algorithms, Comparison & Campus Modules */}
+        <section>
+          <div className="mb-6">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-brand-600">
+              Algorithm & Graph Modules
+            </span>
+            <h2 className="text-2xl font-bold text-slate-900 mt-1">
+              Test algorithms, benchmark trade-offs, and solve campus routing
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {(
+              [
+                {
+                  id: 'algorithms',
+                  title: 'Algorithm Laboratory',
+                  desc: 'Visualize Bubble, Selection, Insertion, Merge, Quick, Heap Sort, Linear/Binary Search, BFS, DFS, Dijkstra, Prim, and Kruskal.',
+                  icon: <BarChart3 className="w-5 h-5 text-brand-600" />,
+                  cta: 'Open Algorithm Lab',
+                },
+                {
+                  id: 'compare',
+                  title: 'Algorithm Compare',
+                  desc: 'Run any two sorting algorithms simultaneously on identical datasets and compare comparisons, swaps, and execution time.',
+                  icon: <GitCompare className="w-5 h-5 text-indigo-600" />,
+                  cta: 'Compare Algorithms',
+                },
+                {
+                  id: 'campus',
+                  title: 'Campus Route Optimizer',
+                  desc: 'Find shortest paths between campus buildings with Dijkstra, build minimum utility networks with Prim/Kruskal, and test walkway closures.',
+                  icon: <MapPin className="w-5 h-5 text-emerald-600" />,
+                  cta: 'Open Campus Map',
+                },
+              ] as const
+            ).map((mod) => (
+              <div
+                key={mod.id}
+                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between gap-4 hover:border-brand-300 transition-colors"
+              >
+                <div className="space-y-2.5">
+                  <div className="p-2.5 w-fit rounded-xl bg-slate-50 border border-slate-200">
+                    {mod.icon}
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">{mod.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{mod.desc}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    onSelectDS(mod.id);
+                  }}
+                  className="w-full py-2 px-3 bg-slate-900 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <span>{mod.cta}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* How Each Operation Executes */}
         <section>
           <motion.div
@@ -797,8 +975,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onSelectDS, onOpenComplexity
               Need a quick Big-O refresher before running traces?
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Review best, average, worst time, and auxiliary space across all four structures side
-              by side, then jump straight into any sandbox.
+              Review best, average, worst time, and auxiliary space across all implemented
+              structures and algorithms side by side, then jump straight into any workspace.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 shrink-0">

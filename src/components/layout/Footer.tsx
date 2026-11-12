@@ -1,15 +1,28 @@
 import React from 'react';
-import { DSAType } from '../../types/dsa';
-import { BookOpen, GitBranch, Link2, Layers, ArrowRightLeft } from 'lucide-react';
+import { AppView } from '../../types/dsa';
+import {
+  BookOpen,
+  GitBranch,
+  Link2,
+  Layers,
+  ArrowRightLeft,
+  Hash,
+  GitFork,
+  ListOrdered,
+  Share2,
+  BarChart3,
+  GitCompare,
+  MapPin,
+} from 'lucide-react';
 import { sound } from '../common/SoundEffects';
 
 interface FooterProps {
-  onNavigate: (view: 'home' | DSAType) => void;
+  onNavigate: (view: AppView) => void;
   onOpenComplexity: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenComplexity }) => {
-  const handleNav = (view: 'home' | DSAType) => {
+  const handleNav = (view: AppView) => {
     sound.playClick();
     onNavigate(view);
   };
@@ -60,8 +73,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenComplexity }) 
               </span>
             </div>
             <p className="text-slate-500 max-w-sm leading-relaxed">
-              Interactive workspace for stepping through singly linked lists, bounded stacks,
-              circular queues, and binary search trees alongside pseudocode and Big-O bounds.
+              Interactive workspace for data structures, algorithm step traces, head-to-head sorting
+              benchmarks, and campus graph pathfinding.
             </p>
           </div>
 
@@ -85,16 +98,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenComplexity }) 
                   className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
                 >
                   <Layers className="w-3.5 h-3.5 text-brand-500" />
-                  <span>Stack (LIFO)</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => handleNav('queue')}
-                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
-                >
-                  <ArrowRightLeft className="w-3.5 h-3.5 text-cyan-500" />
-                  <span>Queue (FIFO)</span>
+                  <span>Stack & Queue</span>
                 </button>
               </li>
               <li>
@@ -106,14 +110,86 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenComplexity }) 
                   <span>Binary Search Tree</span>
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => handleNav('hash-table')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <Hash className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Hash Table</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('heap')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <GitFork className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Binary Heap</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('priority-queue')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <ListOrdered className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Priority Queue</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('graph')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-brand-500" />
+                  <span>Graphs</span>
+                </button>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-slate-800 uppercase tracking-wider mb-3 text-[11px]">
-              Reference
+              Modules & Reference
             </h4>
             <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => handleNav('algorithms')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <BarChart3 className="w-3.5 h-3.5 text-brand-600" />
+                  <span>Algorithm Lab</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('compare')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <GitCompare className="w-3.5 h-3.5 text-brand-600" />
+                  <span>Algorithm Compare</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('campus')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Campus Route Optimizer</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNav('queue')}
+                  className="hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                >
+                  <ArrowRightLeft className="w-3.5 h-3.5 text-cyan-500" />
+                  <span>Circular Queue</span>
+                </button>
+              </li>
               <li>
                 <button
                   onClick={() => {
@@ -125,15 +201,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenComplexity }) 
                   <BookOpen className="w-3.5 h-3.5 text-brand-600" />
                   <span>Big-O Cheat Sheet</span>
                 </button>
-              </li>
-              <li>
-                <span className="text-slate-400">Best / Average / Worst Time</span>
-              </li>
-              <li>
-                <span className="text-slate-400">Auxiliary Space Bounds</span>
-              </li>
-              <li>
-                <span className="text-slate-400">Pointer & Tree Traces</span>
               </li>
             </ul>
           </div>

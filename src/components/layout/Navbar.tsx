@@ -1,30 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
-import { DSAType } from '../../types/dsa';
+import { AppView, DSAType } from '../../types/dsa';
 import {
   Link2,
   Layers,
   ArrowRightLeft,
   GitBranch,
+  Hash,
+  GitFork,
+  ListOrdered,
+  Share2,
+  BarChart3,
+  GitCompare,
+  MapPin,
   Table,
   Home,
   Volume2,
   VolumeX,
   Menu,
   X,
+  ChevronDown,
 } from 'lucide-react';
 import { sound } from '../common/SoundEffects';
 
 interface NavbarProps {
-  currentView: 'home' | DSAType;
-  onNavigate: (view: 'home' | DSAType) => void;
+  currentView: AppView;
+  onNavigate: (view: AppView) => void;
   onOpenComplexity: () => void;
 }
+
+const DS_MENU_ITEMS: { id: DSAType; label: string; icon: React.ReactNode }[] = [
+  { id: 'linked-list', label: 'Linked List', icon: <Link2 className="w-4 h-4 text-emerald-600" /> },
+  { id: 'stack', label: 'Stack', icon: <Layers className="w-4 h-4 text-brand-600" /> },
+  { id: 'queue', label: 'Queue', icon: <ArrowRightLeft className="w-4 h-4 text-cyan-600" /> },
+  { id: 'bst', label: 'Binary Search Tree', icon: <GitBranch className="w-4 h-4 text-indigo-600" /> },
+  { id: 'hash-table', label: 'Hash Table', icon: <Hash className="w-4 h-4 text-amber-600" /> },
+  { id: 'heap', label: 'Binary Heap', icon: <GitFork className="w-4 h-4 text-emerald-600" /> },
+  { id: 'priority-queue', label: 'Priority Queue', icon: <ListOrdered className="w-4 h-4 text-rose-600" /> },
+  { id: 'graph', label: 'Graphs', icon: <Share2 className="w-4 h-4 text-brand-600" /> },
+];
 
 export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, onOpenComplexity }) => {
   const [isMuted, setIsMuted] = useState(sound.isMuted());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dsDropdownOpen, setDsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -40,24 +61,35 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, onOpenC
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    const onClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
+
   const toggleSound = () => {
     const muted = sound.toggleMute();
     setIsMuted(muted);
     if (!muted) sound.playClick();
   };
 
-  const navItems: { id: 'home' | DSAType; label: string; icon: React.ReactNode }[] = [
-    { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
-    { id: 'linked-list', label: 'Linked List', icon: <Link2 className="w-4 h-4" /> },
-    { id: 'stack', label: 'Stack', icon: <Layers className="w-4 h-4" /> },
-    { id: 'queue', label: 'Queue', icon: <ArrowRightLeft className="w-4 h-4" /> },
-    { id: 'bst', label: 'Binary Search Tree', icon: <GitBranch className="w-4 h-4" /> },
+  const isDSActive = DS_MENU_ITEMS.some((item) => item.id === currentView);
+
+  const primaryItems: { id: AppView; label: string; icon: React.ReactNode }[] = [
+    { id: 'algorithms', label: 'Algorithm Lab', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'compare', label: 'Compare', icon: <GitCompare className="w-4 h-4" /> },
+    { id: 'campus', label: 'Campus Map', icon: <MapPin className="w-4 h-4" /> },
   ];
 
-  const handleNavClick = (view: 'home' | DSAType) => {
+  const handleNavClick = (view: AppView) => {
     sound.playClick();
     onNavigate(view);
     setMobileMenuOpen(false);
+    setDsDropdownOpen(false);
   };
 
   return (
@@ -122,7 +154,80 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, onOpenC
           </motion.button>
 
           <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
+            <button
+              onClick={() => handleNavClick('home')}
+              className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                currentView === 'home'
+                  ? 'text-brand-700 font-bold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {currentView === 'home' && (
+                <motion.span
+                  layoutId="activeNavPill"
+                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  className="absolute inset-0 bg-brand-50 border border-brand-200 rounded-xl shadow-sm"
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                <Home className="w-4 h-4" />
+                <span>Home</span>
+              </span>
+            </button>
+
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDsDropdownOpen((prev) => !prev)}
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  isDSActive ? 'text-brand-700 font-bold' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {isDSActive && (
+                  <motion.span
+                    layoutId="activeNavPill"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    className="absolute inset-0 bg-brand-50 border border-brand-200 rounded-xl shadow-sm"
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <Layers className="w-4 h-4" />
+                  <span>Data Structures</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {dsDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.14 }}
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50"
+                  >
+                    {DS_MENU_ITEMS.map((item) => {
+                      const active = currentView === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => handleNavClick(item.id)}
+                          className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium transition-colors ${
+                            active
+                              ? 'bg-brand-50 text-brand-700 font-semibold'
+                              : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {primaryItems.map((item) => {
               const active = currentView === item.id;
               return (
                 <button
@@ -196,7 +301,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, onOpenC
               className="md:hidden overflow-hidden border-t border-slate-100"
             >
               <div className="py-3 space-y-1">
-                {navItems.map((item) => {
+                {[
+                  { id: 'home' as AppView, label: 'Home', icon: <Home className="w-4 h-4" /> },
+                  ...DS_MENU_ITEMS,
+                  ...primaryItems,
+                ].map((item) => {
                   const active = currentView === item.id;
                   return (
                     <button
