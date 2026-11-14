@@ -166,11 +166,10 @@ export const StackPanel: React.FC<StackPanelProps> = ({
               key={cap}
               onClick={() => handleCapacityChange(cap)}
               disabled={isAnimating || cap < stackSize}
-              className={`px-2 py-0.5 rounded text-xs font-mono font-semibold transition-colors disabled:opacity-40 ${
-                capacity === cap
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
+              className={`px-2 py-0.5 rounded text-xs font-mono font-semibold transition-colors disabled:opacity-40 ${capacity === cap
+                ? 'bg-brand-600 text-white'
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
             >
               {cap}
             </button>
